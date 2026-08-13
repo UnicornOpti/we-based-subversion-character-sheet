@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#26354f" />
+  <title>Subversion Character Sheet</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <noscript>This character sheet requires JavaScript in your browser.</noscript>
+
+  <header class="app-toolbar">
+    <div class="toolbar-title">
+      <strong>Subversion Character Sheet</strong>
+      <span id="save-status" aria-live="polite">Saved locally</span>
+    </div>
+    <div class="toolbar-actions">
+      <button type="button" id="new-character">New</button>
+      <button type="button" id="export-character">Export</button>
+      <label class="button-like" for="import-character">Import</label>
+      <input id="import-character" class="visually-hidden" type="file" accept="application/json,.json" />
+      <button type="button" id="print-character">Print</button>
+    </div>
+  </header>
+
+  <main class="sheet" id="character-sheet">
+    <section class="identity-heading">
+      <img src="assets/subversion-logo.png" alt="Subversion" class="logo" />
+      <label class="name-field">
+        <span>Name</span>
+        <input type="text" data-path="name" placeholder="Character name" />
+      </label>
+    </section>
+
+    <section class="identity-grid">
+      <div class="identity-panel blue-panel">
+        <label>Pronouns<input type="text" data-path="pronouns" /></label>
+        <label>Lineage<select id="lineage" data-path="lineage"></select></label>
+        <label>Lineage Option<select id="lineage-option" data-path="lineageOption"></select></label>
+        <p class="choice-note" id="lineage-rule"></p>
+        <label>Origin<select id="origin" data-path="origin"></select></label>
+        <label id="origin-custom-wrap" hidden>Custom Origin<input type="text" data-path="originCustom" /></label>
+        <label>Background<select id="background" data-path="background"></select></label>
+        <label id="background-custom-wrap" hidden>Custom Background<input type="text" data-path="backgroundCustom" /></label>
+        <label>Caste<select id="caste" data-path="caste"></select></label>
+        <p class="choice-note" id="caste-note"></p>
+        <label>Debt<input type="text" data-path="debt" /></label>
+      </div>
+
+      <div class="attribute-panel" aria-label="Attributes">
+        <div class="attribute-column">
+          <label><span>Agility</span><input type="number" min="0" max="7" data-path="attributes.agi" /></label>
+          <label><span>Wit</span><input type="number" min="0" max="7" data-path="attributes.wit" /></label>
+          <label><span>Awareness</span><input type="number" min="0" max="7" data-path="attributes.awr" /></label>
+        </div>
+        <div class="character-mark" aria-hidden="true"><span>SV</span></div>
+        <div class="attribute-column">
+          <label><span>Brawn</span><input type="number" min="0" max="7" data-path="attributes.bwn" /></label>
+          <label><span>Charisma</span><input type="number" min="0" max="7" data-path="attributes.cha" /></label>
+          <label><span>Will</span><input type="number" min="0" max="7" data-path="attributes.wil" /></label>
+        </div>
+      </div>
+
+      <div class="identity-panel values-panel">
+        <label>Ideology<select id="ideology" data-path="ideology"></select></label>
+        <label>Value<input type="text" data-path="values.0" /></label>
+        <label>Value<input type="text" data-path="values.1" /></label>
+        <label>Value<input type="text" data-path="values.2" /></label>
+      </div>
+    </section>
+
+    <img src="assets/decoration.webp" class="divider-image" alt="" />
+
+    <section class="trackers-grid">
+      <article class="tracker-section defense-section">
+        <h2>Defense</h2>
+        <div class="tracker-cards defense-cards">
+          <div class="stat-card"><span>Guard</span><strong id="stat-guard">8</strong></div>
+          <div class="stat-card"><span>Vigilance</span><strong id="stat-vigilance">8</strong></div>
+          <div class="stat-card"><span>Aegis</span><strong id="stat-aegis">8</strong></div>
+          <div class="stat-card"><span>Initiative</span><strong id="stat-initiative">0</strong></div>
+          <div class="stat-card"><span>Armor</span><strong id="stat-armor">0</strong></div>
+          <div class="stat-card"><span>Adamant</span><strong id="stat-adamant">0</strong></div>
+        </div>
+        <details>
+          <summary>Adjust defense bonuses</summary>
+          <div class="modifier-grid">
+            <label>Guard<input type="number" data-path="modifiers.guard" /></label>
+            <label>Vigilance<input type="number" data-path="modifiers.vigilance" /></label>
+            <label>Aegis<input type="number" data-path="modifiers.aegis" /></label>
+            <label>Initiative<input type="number" data-path="modifiers.initiative" /></label>
+            <label>Armor<input type="number" data-path="modifiers.armor" /></label>
+            <label>Adamant<input type="number" data-path="modifiers.adamant" /></label>
+          </div>
+        </details>
+      </article>
+
+      <article class="tracker-section condition-section">
+        <h2>Condition</h2>
+        <div class="tracker-cards condition-cards">
+          <label class="condition-card"><span>Health</span><span><input type="number" data-path="resources.health.current" /> / <strong id="max-health">12</strong></span></label>
+          <label class="condition-card"><span>Animity</span><span><input type="number" data-path="resources.animity.current" /> / <strong id="max-animity">12</strong></span></label>
+          <label class="condition-card"><span>Grit</span><span><input type="number" data-path="resources.grit.current" /> / <strong id="max-grit">6</strong></span></label>
+        </div>
+        <div class="consequences">
+          <span>Consequences</span>
+          <div id="consequence-boxes" role="group" aria-label="Consequences"></div>
+          <small>+1 instance of Dulled each</small>
+        </div>
+        <details>
+          <summary>Adjust condition maximums</summary>
+          <div class="modifier-grid">
+            <label>Health<input type="number" data-path="modifiers.health" /></label>
+            <label>Animity<input type="number" data-path="modifiers.animity" /></label>
+            <label>Grit<input type="number" data-path="modifiers.grit" /></label>
+          </div>
+        </details>
+      </article>
+    </section>
+
+    <nav class="tabs" aria-label="Character sheet sections">
+      <button type="button" class="tab-button active" data-tab="details">Details</button>
+      <button type="button" class="tab-button" data-tab="description">Description</button>
+      <button type="button" class="tab-button" data-tab="items">Items</button>
+      <button type="button" class="tab-button" data-tab="abilities">Abilities</button>
+    </nav>
+
+    <section class="tab-panel active" data-panel="details">
+      <div class="details-grid">
+        <article class="impulses-panel">
+          <h2>Impulses</h2>
+          <label>Names<textarea data-path="impulses.names"></textarea></label>
+          <label>Triggers<textarea data-path="impulses.triggers"></textarea></label>
+          <label>Downtime<textarea data-path="impulses.downtime"></textarea></label>
+        </article>
+
+        <article class="skills-panel">
+          <h2>Skills</h2>
+          <section class="roll-modifiers">
+            <div class="section-heading"><h3>Roll Modifiers</h3><button type="button" id="reset-roll-modifiers">Reset</button></div>
+            <div class="roll-modifier-grid">
+              <label>Linked Attribute (if different)<select id="roll-attribute" data-path="rollModifiers.attribute"></select></label>
+              <label>Modify # of Dice<input type="number" min="-20" max="20" data-path="rollModifiers.diceModifier" /></label>
+              <label>Reliable<input type="number" min="0" max="6" data-path="rollModifiers.reliable" /></label>
+              <label>Dulled<input type="number" min="0" max="20" data-path="rollModifiers.dulled" /></label>
+              <label class="checkbox-label">Inspired<input type="checkbox" data-path="rollModifiers.inspired" /></label>
+            </div>
+            <p>Consequences and untrained penalties are applied automatically. Keywords resolve Dulled, Inspired, then Reliable.</p>
+          </section>
+          <div class="table-scroll">
+            <table class="skills-table">
+              <thead><tr><th>Skill</th><th>Attr.</th><th>Trained</th><th>Rank</th><th>Attribute</th><th>Misc.</th><th>Roll</th></tr></thead>
+              <tbody id="skills-body"></tbody>
+            </table>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="tab-panel" data-panel="description">
+      <label class="large-notes">Character Description, Appearance, Background, and Notes
+        <textarea data-path="biography" placeholder="Write freely here..."></textarea>
+      </label>
+    </section>
+
+    <section class="tab-panel" data-panel="items">
+      <div class="catalog-picker">
+        <label>Add Core Rules Item<select id="item-picker"><option value="">Choose an item...</option></select></label>
+        <button type="button" id="add-item">Add</button>
+        <button type="button" id="add-custom-item" class="secondary">Custom Item</button>
+      </div>
+      <div class="table-scroll">
+        <table class="catalog-table"><thead><tr><th>Name</th><th>Qty.</th><th>Category</th><th>Cost</th><th>Rules</th><th></th></tr></thead><tbody id="items-body"></tbody></table>
+      </div>
+      <p class="empty-message" id="items-empty">No items added yet.</p>
+    </section>
+
+    <section class="tab-panel" data-panel="abilities">
+      <div class="catalog-search-row">
+        <label>Find an Ability<input type="search" id="ability-search" placeholder="Type a name or paradigm..." /></label>
+      </div>
+      <div class="catalog-picker">
+        <label>Add Core Rules Ability<select id="ability-picker"><option value="">Choose an ability...</option></select></label>
+        <button type="button" id="add-ability">Add</button>
+        <button type="button" id="add-custom-ability" class="secondary">Custom Ability</button>
+      </div>
+      <div class="table-scroll">
+        <table class="catalog-table abilities-table"><thead><tr><th>Name</th><th>Paradigm</th><th>Page</th><th>Cost</th><th>Effect</th><th></th></tr></thead><tbody id="abilities-body"></tbody></table>
+      </div>
+      <p class="empty-message" id="abilities-empty">No abilities added yet.</p>
+    </section>
+  </main>
+
+  <dialog id="roll-dialog" class="app-dialog">
+    <div id="roll-result"></div>
+    <form method="dialog"><button>Close</button></form>
+  </dialog>
+
+  <dialog id="entry-dialog" class="app-dialog entry-dialog">
+    <form id="entry-form">
+      <h2 id="entry-dialog-title">Custom Entry</h2>
+      <input type="hidden" id="entry-type" />
+      <label>Name<input id="entry-name" required /></label>
+      <label id="entry-group-label">Category<input id="entry-group" /></label>
+      <label id="entry-page-label">Page<input id="entry-page" type="number" min="0" /></label>
+      <label>Cost<input id="entry-cost" /></label>
+      <label>Rules / Effect<textarea id="entry-effect" required></textarea></label>
+      <div class="dialog-actions"><button type="button" id="entry-cancel" class="secondary">Cancel</button><button type="submit">Add</button></div>
+    </form>
+  </dialog>
+
+  <footer class="site-footer">
+    <span>Subversion browser character sheet</span>
+    <span>Characters are saved only in this browser unless exported.</span>
+  </footer>
+
+  <script src="catalog-data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

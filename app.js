@@ -134,8 +134,9 @@
   function defaultState() {
     return {
       format: "subversion-browser-character",
-      version: 1,
+      version: 2,
       name: "",
+      portrait: { dataUrl: "", fileName: "" },
       pronouns: "",
       lineage: "",
       lineageOption: "",
@@ -202,9 +203,87 @@
     status.textContent = "Saving…";
     clearTimeout(saveTimer);
     saveTimer = setTimeout(() => {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-      status.textContent = "Saved locally";
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        status.textContent = "Saved locally";
+      } catch (error) {
+        console.error("Unable to save character", error);
+        status.textContent = "Could not save — export a backup";
+      }
     }, 220);
+  }
+
+  function renderPortrait() {
+    const image = document.getElementById("portrait-image");
+    const placeholder = document.getElementById("portrait-placeholder");
+    const remove = document.getElementById("remove-portrait");
+    const hasPortrait = Boolean(state.portrait?.dataUrl);
+    if (hasPortrait) image.src = state.portrait.dataUrl;
+    else image.removeAttribute("src");
+    image.hidden = !hasPortrait;
+    placeholder.hidden = hasPortrait;
+    remove.hidden = !hasPortrait;
+  }
+
+  function loadImageFile(file) {
+    return new Promise((resolve, reject) => {
+      const objectUrl = URL.createObjectURL(file);
+      const image = new Image();
+      image.onload = () => {
+        URL.revokeObjectURL(objectUrl);
+        resolve(image);
+      };
+      image.onerror = () => {
+        URL.revokeObjectURL(objectUrl);
+        reject(new Error("That image could not be opened."));
+      };
+      image.src = objectUrl;
+    });
+  }
+
+  async function makePortraitData(file) {
+    if (!file.type.startsWith("image/")) throw new Error("Choose a JPG, PNG, WebP, or GIF image.");
+    if (file.size > 20 * 1024 * 1024) throw new Error("Choose an image smaller than 20 MB.");
+    const image = await loadImageFile(file);
+    const sourceWidth = image.naturalWidth || image.width;
+    const sourceHeight = image.naturalHeight || image.height;
+    if (!sourceWidth || !sourceHeight) throw new Error("That image has no readable dimensions.");
+
+    const targetRatio = 3 / 4;
+    const sourceRatio = sourceWidth / sourceHeight;
+    let sx = 0;
+    let sy = 0;
+    let sw = sourceWidth;
+    let sh = sourceHeight;
+    if (sourceRatio > targetRatio) {
+      sw = sourceHeight * targetRatio;
+      sx = (sourceWidth - sw) / 2;
+    } else {
+      sh = sourceWidth / targetRatio;
+      sy = (sourceHeight - sh) / 2;
+    }
+
+    const canvas = document.createElement("canvas");
+    canvas.width = 600;
+    canvas.height = 800;
+    const context = canvas.getContext("2d", { alpha: true });
+    if (!context) throw new Error("Your browser could not prepare that image.");
+    context.imageSmoothingEnabled = true;
+    context.imageSmoothingQuality = "high";
+    context.drawImage(image, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
+    let dataUrl = canvas.toDataURL("image/webp", 0.82);
+    if (!dataUrl.startsWith("data:image/webp") || dataUrl.length > 900000) {
+      const smaller = document.createElement("canvas");
+      smaller.width = 450;
+      smaller.height = 600;
+      const smallerContext = smaller.getContext("2d", { alpha: false });
+      smallerContext.fillStyle = "#f4f0e6";
+      smallerContext.fillRect(0, 0, smaller.width, smaller.height);
+      smallerContext.drawImage(canvas, 0, 0, smaller.width, smaller.height);
+      dataUrl = smaller.toDataURL("image/jpeg", 0.76);
+    }
+    if (dataUrl.length > 1200000) throw new Error("That image remains too large after resizing. Try a simpler or smaller image.");
+    return dataUrl;
   }
 
   function fillSelect(select, choices, placeholder, selected = "") {
@@ -534,6 +613,7 @@
   function renderAll() {
     initializeChoiceSelects();
     syncStaticInputs();
+    renderPortrait();
     renderSkills();
     buildCatalogPickers();
     renderItems();
@@ -595,6 +675,34 @@
     state.rollModifiers = { attribute: "", diceModifier: 0, reliable: 0, dulled: 0, inspired: false };
     syncStaticInputs();
     deriveStats();
+    scheduleSave();
+  });
+
+  document.getElementById("choose-portrait-from-frame").addEventListener("click", () => {
+    document.getElementById("portrait-file").click();
+  });
+
+  document.getElementById("portrait-file").addEventListener("change", async event => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    const status = document.getElementById("save-status");
+    status.textContent = "Preparing portrait…";
+    try {
+      const dataUrl = await makePortraitData(file);
+      state.portrait = { dataUrl, fileName: file.name || "portrait" };
+      renderPortrait();
+      scheduleSave();
+    } catch (error) {
+      status.textContent = "Portrait not changed";
+      alert(error.message || "The portrait could not be added.");
+    } finally {
+      event.target.value = "";
+    }
+  });
+
+  document.getElementById("remove-portrait").addEventListener("click", () => {
+    state.portrait = { dataUrl: "", fileName: "" };
+    renderPortrait();
     scheduleSave();
   });
 

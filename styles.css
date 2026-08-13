@@ -182,19 +182,29 @@ label { display: grid; gap: 3px; font-weight: 700; }
 .attribute-column { display: grid; gap: 28px; }
 .attribute-column label { color: var(--ink); font: 17px/1 Goodbrush, sans-serif; text-align: center; }
 .attribute-column input { height: 40px; text-align: center; font: 21px/1 Arial, sans-serif; border: 2px solid var(--yellow); }
+.portrait-control { display: grid; justify-items: center; align-content: center; gap: 8px; min-width: 0; }
 .character-mark {
   display: grid;
   place-items: center;
   width: 190px;
   aspect-ratio: 3 / 4;
   margin: auto;
+  padding: 0;
   color: #fff;
   background: linear-gradient(145deg, #b19a69, #877344);
   border: 3px solid var(--yellow);
   clip-path: polygon(9% 0, 91% 0, 100% 10%, 100% 90%, 91% 100%, 9% 100%, 0 90%, 0 10%);
   box-shadow: 0 6px 15px rgba(34, 31, 25, .28);
+  cursor: pointer;
+  overflow: hidden;
 }
 .character-mark span { display: grid; place-items: center; width: 92px; height: 92px; border: 5px solid white; border-radius: 50%; font: 34px/1 Goodbrush, sans-serif; }
+.character-mark img { width: 100%; height: 100%; object-fit: cover; border: 0; }
+.character-mark:focus-visible { outline: 4px solid #26354f; outline-offset: 3px; }
+.portrait-actions { display: flex; justify-content: center; flex-wrap: wrap; gap: 6px; }
+.portrait-actions .button-like,
+.portrait-actions button { min-height: 32px; padding: 6px 10px; font-size: 12px; }
+.portrait-control small { max-width: 180px; color: #554d41; font-size: 10px; line-height: 1.25; text-align: center; }
 
 .divider-image { display: block; width: 100%; height: 24px; object-fit: fill; border: 0; margin: 14px 0 6px; opacity: .85; }
 
@@ -396,6 +406,8 @@ td { padding: 5px 6px; background: var(--paper-deep); border-bottom: 2px solid r
   .tabs,
   details,
   .delete-entry { display: none !important; }
+  .portrait-actions,
+  .portrait-control small { display: none !important; }
   .sheet { width: 100%; margin: 0; padding: 0; border: 0; box-shadow: none; }
   .identity-grid { grid-template-columns: 1fr 1.7fr 1fr; }
   .attribute-panel { grid-template-columns: 1fr 140px 1fr; }

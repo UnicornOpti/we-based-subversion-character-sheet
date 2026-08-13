@@ -54,7 +54,18 @@
           <label><span>Wit</span><input type="number" min="0" max="7" data-path="attributes.wit" /></label>
           <label><span>Awareness</span><input type="number" min="0" max="7" data-path="attributes.awr" /></label>
         </div>
-        <div class="character-mark" aria-hidden="true"><span>SV</span></div>
+        <div class="portrait-control">
+          <button type="button" class="character-mark" id="choose-portrait-from-frame" aria-label="Choose a character portrait">
+            <img id="portrait-image" alt="Character portrait" hidden />
+            <span id="portrait-placeholder" aria-hidden="true">SV</span>
+          </button>
+          <div class="portrait-actions">
+            <label class="button-like portrait-button" for="portrait-file">Choose Portrait</label>
+            <input id="portrait-file" class="visually-hidden" type="file" accept="image/jpeg,image/png,image/webp,image/gif" />
+            <button type="button" id="remove-portrait" class="secondary" hidden>Remove</button>
+          </div>
+          <small>Saved with this character and included in exports.</small>
+        </div>
         <div class="attribute-column">
           <label><span>Brawn</span><input type="number" min="0" max="7" data-path="attributes.bwn" /></label>
           <label><span>Charisma</span><input type="number" min="0" max="7" data-path="attributes.cha" /></label>
